@@ -1,68 +1,53 @@
 using System.Collections;
+using System.Threading;
 using UnityEngine;
 
 public class PistolaDos : Arma
 {
     private int cartuchos = 2;
+    private int maxBullets = 15;
     private float recargaTiempo = 5f;
-    private bool enRecarga = false;
-    private float tiempoUltimoDisparo;
+    private bool needReload = false;
+    private float lastShootTime;
 
-    public void Start()
+
+    public PistolaDos()
     {
         PlayerSpeed = 10;
         BulletDamage = 15;
         bullets = 15;
+        maxBullets = bullets;
         shootDelay = 0.3f;
         currentShootType = ShootType.Single;
-        tiempoUltimoDisparo = -recargaTiempo;
     }
 
-    void Update()
+    private void TimeGun(float time)
     {
-        // Verifica si se han agotado las balas y el arma no está en recarga
-        if (bullets <= 0 && !enRecarga)
+        time -= Time.deltaTime;
+        if (time <= 0)
         {
-            cartuchos--;
             if (cartuchos > 0)
             {
-                StartCoroutine(RecargarArma());
-            }
-            else
-            {
-                enRecarga = true;
-                tiempoUltimoDisparo = Time.time;
+                bullets = maxBullets;
+                cartuchos--;
+                needReload = false;
             }
         }
 
-        // Si está en recarga y el tiempo ha pasado, restablece los cartuchos y balas
-        if (enRecarga && Time.time - tiempoUltimoDisparo >= recargaTiempo)
-        {
-            cartuchos = 2;
-            bullets = 15;
-            enRecarga = false;
-        }
-    }
-
-    private IEnumerator RecargarArma()
-    {
-        enRecarga = true;
-        yield return new WaitForSeconds(recargaTiempo);
-        bullets = 15;
-        enRecarga = false;
-        Debug.Log("Cartucho recargado, balas disponibles: " + bullets);
     }
 
     public override void Shoot()
     {
-        if (!enRecarga && bullets > 0)
+        if (Time.time - lastShootTime >= shootDelay && bullets > 0)
         {
-            base.Shoot();
-        }
-        else if (enRecarga)
-        {
-            Debug.Log("En recarga, espera unos segundos.");
+
+            bullets--;
+            lastShootTime = Time.time;
+
+            if (bullets <= 0)
+
+                needReload = true;
+            TimeGun(5);
         }
     }
 }
-

@@ -1,94 +1,79 @@
 using System.Collections;
 using UnityEngine;
 
-public abstract class Arma : MonoBehaviour
+public abstract class Arma
 {
-    public Transform shootSpawn;
-    public GameObject[] bulletPrefabs;
-    public int BulletDamage;
-    public bool shooting;
-    public int bullets;
-    public int PlayerSpeed;
+    protected int BulletDamage;
+    protected int bullets;
+    protected int PlayerSpeed;
+    protected float shootDelay = 0.2f;
 
-    public float lastShootTime = 0f;
-    public float shootDelay = 0.2f;
+    protected ShootType currentShootType = ShootType.Single;
 
-    public enum ShootType
-    {
-        Single,
-        Burst,
-        Auto
-    }
+    public Arma() { }
 
-    public ShootType currentShootType = ShootType.Single;
-    private int selectedBulletIndex = 0;
+    //hacer funcion booleana de shoot public 
 
-    // Método virtual ?
     public virtual void Shoot()
     {
-        if (Time.time - lastShootTime > shootDelay && bullets > 0)
-        {
-            switch (currentShootType)
-            {
-                case ShootType.Single:
-                    InstantiateBullet();
-                    break;
-                case ShootType.Burst:
-                    StartCoroutine(ShootBurst());
-                    break;
-                case ShootType.Auto:
-                    StartCoroutine(ShootAuto());
-                    break;
-            }
-            bullets--;
-            lastShootTime = Time.time;
-        }
+        bullets--;
     }
 
-    public void Update()
+    public ShootType GetcurrentShootType()
     {
-        if (Input.GetButtonDown("Fire1"))
-        {
-            shooting = true;
-        }
-        if (Input.GetButtonUp("Fire1"))
-        {
-            shooting = false;
-        }
-
-        // aqui
-        if (shooting)
-        {
-            Shoot();
-        }
+        return currentShootType;
     }
-
-    public void InstantiateBullet()
+    public int GetBulletDamage()
     {
-        if (bulletPrefabs.Length > 0 && selectedBulletIndex >= 0 && selectedBulletIndex < bulletPrefabs.Length)
-        {
-            Instantiate(bulletPrefabs[selectedBulletIndex], shootSpawn.position, shootSpawn.rotation);
-        }
+        return BulletDamage;
     }
 
-    public IEnumerator ShootBurst()
+    public float GetshootDelay()
     {
-        int bulletCount = 3;
-        float burstDelay = 0.1f;
-
-        for (int i = 0; i < bulletCount; i++)
-        {
-            InstantiateBullet();
-            yield return new WaitForSeconds(burstDelay);
-        }
+        return shootDelay;
     }
 
-    public IEnumerator ShootAuto()
+    public int Getbullets()
     {
-        while (shooting)
-        {
-            InstantiateBullet();
-            yield return new WaitForSeconds(shootDelay);
-        }
+        return bullets;
     }
+
+    public int GetPlayerSpeed()
+    {
+        return PlayerSpeed;
+    }
+
+    //set
+
+    public void SetBulletDamage(int _BulletDamage)
+    {
+        BulletDamage = _BulletDamage;
+    }
+    public void SetBullets(int _bullets)
+    {
+        bullets = _bullets;
+    }
+    public void SetPlayerSpeed(int _PlayerSpeed)
+    {
+        PlayerSpeed = _PlayerSpeed;
+    }
+
+    public void SetshootDelay(float _shootDelay)
+    {
+        shootDelay = _shootDelay;
+    }
+
+    public ShootType SetcurrentShootType()
+    {
+        return currentShootType;
+    }
+
+
+}
+
+public enum ShootType
+{
+    Single,
+    Burst,
+    Auto
 }

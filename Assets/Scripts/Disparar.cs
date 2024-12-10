@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using UnityEngine;
 
 public class Disparar : MonoBehaviour
@@ -35,3 +35,4 @@ public class Disparar : MonoBehaviour
         }
     }
 }
+*/
